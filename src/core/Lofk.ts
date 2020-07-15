@@ -1,14 +1,33 @@
-const PLATFORMS: { [key: string]: any } = {
-  discord: 'Discord',
+import { EventEmitter } from 'events';
+
+const runImplementation = async (platform: string, eventManager: EventEmitter) => {
+  switch(platform) {
+    case 'discord':
+      const { DiscordImplementation } = await import(`../platforms/discord/discord`);
+      new DiscordImplementation(eventManager);
+      break;
+
+    default:
+      console.log('No implementation selected');
+  }
 };
 
-const runImplementation = (platform: string) => {
-  const selectedPlatform = PLATFORMS[platform.toLowerCase()];
-  const implementation = import(`src/platforms/${selectedPlatform}`)
-};
+/*const registerEventHandlers = (eventManager: EventEmitter, handlers) => {
+  // parseCommands();
+  /* eventManager.emit('fight', {
+    player: someData,
+    opponent: someData,
+  });
 
-export const server = (platform: String) => {
-  runImplementation(platform);
+  eventManager.on('fight', handlers.startFight);
+  eventManager.on('attack', handlers.attackPlayer);
+  eventManager.on('finish', handlers.fini)
+}; */
+
+export const server = (platform: string) => {
+  const eventManager = new EventEmitter();
+  // registerEventHandlers(eventManager);
+  runImplementation(platform, eventManager);
 };
 
 /*
