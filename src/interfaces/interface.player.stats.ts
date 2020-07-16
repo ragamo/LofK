@@ -1,4 +1,4 @@
-export default interface Stats {
+export default interface PlayerStats {
   hp: number,
   str: number,
   dex: number,

@@ -9,19 +9,23 @@ enum WeaponAttackType {
   Magical,
 }
 
-interface WeaponBonus {
-  crit: number;
+export interface WeaponBonus {
+  critical?: number,
+  evasion?: number,
+  goldMultiplier?: number,
+  addFocus?: number,
 }
 
-interface WeaponAbility {
+export interface WeaponAbility {
   name: string,
   rolls: number,
   rollDmg: number,
 }
 
-export default interface Weapon {
+export default interface PlayerWeapon {
   name: string,
   type: WeaponType,
+  stat: string,
   attackType: WeaponAttackType,
   bonuses?: WeaponBonus[],
   abilities: WeaponAbility[],

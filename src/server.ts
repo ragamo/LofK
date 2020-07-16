@@ -1,4 +1,4 @@
 import './dotenv';
-import { server } from './core/Lofk';
+import Lofk from './core/Lofk';
 
-server('discord');
+new Lofk(['discord']);

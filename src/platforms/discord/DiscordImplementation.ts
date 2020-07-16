@@ -24,7 +24,7 @@ export class DiscordImplementation {
   }
 
   /**
-   * Launch implementation connecting to server
+   * Launch implementation by connecting to server
    */
   public start() {
     this.client.login(process.env.DISCORD_TOKEN);
@@ -43,7 +43,7 @@ export class DiscordImplementation {
   }
 
   /**
-   * Handle message events
+   * Handle discord events
    */
   private handleEvents() {
     // Ready
@@ -57,7 +57,7 @@ export class DiscordImplementation {
   }
 
   /**
-   * Parse a message and indentify a command
+   * Parse a message string and indentify the command with args
    * @param message discord chat message
    */
   private parseCommand(message: string) {

@@ -1,50 +1,40 @@
 import { EventEmitter } from 'events';
+import StateManager from './StateManager';
+export default class Lokf {
+  private eventManager: EventEmitter = new EventEmitter();
+  private stateManager: StateManager;
 
-const runImplementation = async (platform: string, eventManager: EventEmitter) => {
-  switch(platform) {
-    case 'discord':
-      const { DiscordImplementation } = await import(`../platforms/discord/DiscordImplementation`);
-      new DiscordImplementation(eventManager);
-      break;
+  constructor(platforms: string[]) {
+    this.stateManager = new StateManager({});
+    this.prepare();
 
-    default:
-      console.log('No implementation selected');
+    for(const platform of platforms) {
+      this.runPlatform(platform, this.eventManager);
+    }
   }
-};
 
-/*const registerEventHandlers = (eventManager: EventEmitter, handlers) => {
-  // parseCommands();
-  /* eventManager.emit('fight', {
-    player: someData,
-    opponent: someData,
-  });
+  private prepare() {
+    // this.setDefaultState();
+    this.handleEvents();
+  }
 
-  eventManager.on('fight', handlers.startFight);
-  eventManager.on('attack', handlers.attackPlayer);
-  eventManager.on('finish', handlers.fini)
-}; */
+  private async runPlatform(platform: string, eventManager: EventEmitter) {
+    switch(platform) {
+      case 'discord':
+        const { DiscordImplementation } = await import(`../platforms/discord/DiscordImplementation`);
+        new DiscordImplementation(eventManager);
+        break;
+  
+      default:
+        console.log('No implementation selected');
+    }
+  }
 
-export const server = (platform: string) => {
-  const eventManager = new EventEmitter();
-  // registerEventHandlers(eventManager);
-  runImplementation(platform, eventManager);
-};
-
-/*
-const EventEmitter = require('events');
-
-module.exports = (platform) => {
-  const eventManager = loadPlatform(platform);
-  const game = loadGameState();
-
-  eventManager.registerCommand('fight', game.startFight);
-
-
-  const events = new EventEmitter();
-  return {
-    on(eventName, callback) {
-      events.on(eventName, callback);
-    },
-  };
-};
-*/
+  private handleEvents() {
+    this.eventManager.on('prepareBattle', this.stateManager.prepareBattle.bind(this));
+    this.eventManager.on('selectStats', this.stateManager.selectStats.bind(this))
+    this.eventManager.on('selectWeapon', this.stateManager.selectWeapon.bind(this))
+    this.eventManager.on('beginBattle', this.stateManager.beginBattle.bind(this));
+    this.eventManager.on('playerAttack', this.stateManager.playerAttack.bind(this));
+  }
+}

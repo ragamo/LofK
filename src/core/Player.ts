@@ -1,13 +1,29 @@
-import Stats from '../interfaces/interface.stats';
-import Weapon from '../interfaces/interface.weapon';
+import PlayerStats from '../interfaces/interface.player.stats';
+import PlayerWeapon from '../interfaces/interface.player.weapon';
+import PlayerInterface from '../interfaces/interface.player';
 
 export default class Player {
-  private stats: Stats;
-  private weapon: Weapon;
+  private name: string;
+  private race: string;
+  private stats: PlayerStats;
+  private weapon: PlayerWeapon;
   private oponent: Player;
+
+  private onMatch: boolean = false;
   
-  constructor(stats: Stats, weapon: Weapon) {
-    this.stats = stats;
-    this.weapon = weapon;
+  constructor(props: PlayerInterface) {
+    this.name = props.name;
+    this.race = props.race;
+    this.stats = props.stats;
+    this.weapon = props.weapon;
+    this.oponent = props.oponent;
+  }
+
+  setOnMatch(status: boolean) {
+    this.onMatch = status;
+  }
+
+  setOponent(oponent: Player) {
+    this.oponent = oponent;
   }
 };
