@@ -1,9 +1,11 @@
 import { DiscordAPIError } from "discord.js";
 
+import Discord from 'discord.js';
+
 export default {
 	name: 'ping',
 	description: 'Ping!',
-	execute(message: any, args: any) {
+	execute(message: Discord.Message, args: string[]) {
 		message.channel.send('Pong.');
 	},
 };
