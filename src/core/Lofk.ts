@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 const runImplementation = async (platform: string, eventManager: EventEmitter) => {
   switch(platform) {
     case 'discord':
-      const { DiscordImplementation } = await import(`../platforms/discord/discord`);
+      const { DiscordImplementation } = await import(`../platforms/discord/DiscordImplementation`);
       new DiscordImplementation(eventManager);
       break;
 
