@@ -1,23 +1,28 @@
 import { EventEmitter } from 'events';
-import StateManager from './StateManager';
+import Store from './Store';
+import MatchManager from './MatchManager';
+
 export default class Lokf {
   private eventManager: EventEmitter = new EventEmitter();
-  private stateManager: StateManager;
+  private storeManager: Store = new Store();
+  // private matchManager: MatchManager;
 
+  /**
+   * Constructor
+   */
   constructor(platforms: string[]) {
-    this.stateManager = new StateManager({});
-    this.prepare();
+    const matchManager = new MatchManager(this.storeManager, this.eventManager);
 
     for(const platform of platforms) {
       this.runPlatform(platform, this.eventManager);
     }
   }
 
-  private prepare() {
-    // this.setDefaultState();
-    this.handleEvents();
-  }
-
+  /**
+   * Load platform
+   * @param platform platform name
+   * @param eventManager event manager
+   */
   private async runPlatform(platform: string, eventManager: EventEmitter) {
     switch(platform) {
       case 'discord':
@@ -28,13 +33,5 @@ export default class Lokf {
       default:
         console.log('No implementation selected');
     }
-  }
-
-  private handleEvents() {
-    this.eventManager.on('prepareBattle', this.stateManager.prepareBattle.bind(this));
-    this.eventManager.on('selectStats', this.stateManager.selectStats.bind(this))
-    this.eventManager.on('selectWeapon', this.stateManager.selectWeapon.bind(this))
-    this.eventManager.on('beginBattle', this.stateManager.beginBattle.bind(this));
-    this.eventManager.on('playerAttack', this.stateManager.playerAttack.bind(this));
   }
 }

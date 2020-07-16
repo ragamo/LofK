@@ -3,8 +3,8 @@ import PlayerWeapon from '../interfaces/interface.player.weapon';
 import PlayerInterface from '../interfaces/interface.player';
 
 export default class Player {
-  private name: string;
-  private race: string;
+  public name: string;
+  public race: string;
   private stats: PlayerStats;
   private weapon: PlayerWeapon;
   private oponent: Player;
