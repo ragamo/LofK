@@ -1,7 +1,9 @@
 import Discord from 'discord.js';
 import { EventEmitter } from 'events';
 import DiscordCommand from '../../interfaces/interface.discord.command';
-import CommandPing from './commands/command.ping';
+import PingCommand from './commands/PingCommand';
+import FightCommand from './commands/FightCommand';
+import StatSelection from './commands/StatsSelection';
 
 export class DiscordImplementation {
   private prefix:string = '!';
@@ -16,10 +18,12 @@ export class DiscordImplementation {
     this.eventManager = eventManager;
     
     this.registerCommands([
-      CommandPing,
+      new PingCommand(),
+      new FightCommand(),
     ]);
 
-    this.handleEvents();
+    this.handleDiscordEvents();
+    this.handleLofkEvents();
     this.start();
   }
 
@@ -28,7 +32,7 @@ export class DiscordImplementation {
    */
   public start() {
     this.client.login(process.env.DISCORD_TOKEN);
-    console.log('Discord client connected to server');
+    console.log('🧐 Discord client connected to server');
   }
 
   /**
@@ -38,22 +42,22 @@ export class DiscordImplementation {
   private registerCommands(commands: DiscordCommand[]) {
     for(const command of commands) {
       this.commands.set(command.name, command);
-      console.log(command.name + ' registered');
+      console.log(`🏷  ${command.name} command registered`);
     }
   }
 
   /**
    * Handle discord events
    */
-  private handleEvents() {
+  private handleDiscordEvents() {
     // Ready
     this.client.once('ready', () => {
-      console.log('Discord client is ready and listening');
+      console.log('🙂 Discord client is ready and listening');
       this.eventManager.emit('ready');
     });
 
     // Message
-    this.client.on('message', this.processCommand.bind(this));
+    this.client.on('message', this.processRequest.bind(this));
   }
 
   /**
@@ -71,19 +75,27 @@ export class DiscordImplementation {
    * Detect which command was invoked and execute it
    * @param message incomming message
    */
-  private processCommand(message: Discord.Message) {
+  private processRequest(message: Discord.Message) {
     if (!message.content.startsWith(this.prefix) || message.author.bot) 
       return;
 
-    const { command, args } = this.parseCommand(message.content);
+    const { command } = this.parseCommand(message.content);
 
     if (!this.commands.has(command)) 
       return;
 
     try {
-      this.commands.get(command).execute(message, args);
+      this.commands.get(command).execute(message, this.eventManager);
     } catch (err) {
       console.error(err);
     }
+  }
+
+  /** 
+   * Handle game events
+   */
+  private handleLofkEvents() {
+    const statSelector = new StatSelection(this.eventManager);
+    this.eventManager.on('selectStats', statSelector.execute.bind(statSelector));
   }
 };

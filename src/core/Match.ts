@@ -1,21 +1,32 @@
+import { v4 as uuidv4 } from 'uuid';
 import Player from "./Player";
 
 export default class Match {
-  private guid: string;
-  private player1: Player;
-  private player2: Player;
+  public id: string;
+  private context: any;
+  public player1: Player;
+  public player2: Player;
   private log: any;
 
-  constructor(player1: Player, player2: Player) {
+  constructor(player1: Player, player2: Player, context: any) {
+    this.id = uuidv4();
+    this.context = context;
+    
     this.player1 = player1;
     this.player2 = player2;
+
+    this.player1.setOnMatch(true);
+    this.player2.setOnMatch(true);
+
+    this.player1.setOpponent(player2);
+    this.player2.setOpponent(player1);
+
+    // Randomize initial stats
+    this.player1.generateEligibleStats(3);
+    this.player2.generateEligibleStats(3);
   }
   
-  public getPlayer1() {
-    return this.player1;
-  }
-  
-  public getPlayer2() {
-    return this.player2;
+  public getContext() {
+    return this.context;
   }
 }
