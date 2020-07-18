@@ -4,8 +4,9 @@ import DiscordCommand from '../../interfaces/interface.discord.command';
 import PingCommand from './commands/PingCommand';
 import FightCommand from './commands/FightCommand';
 import StatSelection from './commands/StatsSelection';
+import IPlatform from '../../interfaces/IPlatform';
 
-export class DiscordImplementation {
+export class DiscordImplementation implements IPlatform {
   private prefix:string = '!';
   private eventManager: EventEmitter;
   private client: Discord.Client = new Discord.Client();

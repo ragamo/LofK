@@ -30,18 +30,13 @@ export default class MatchManager {
     this.eventManager.on('playerAttack', this.playerAttack.bind(this));
   }
 
-  private isPlayerOnMatch(player: Player): boolean {
-    if (!this.players.has(player.id)) {
-      return false;
-    }
-
-    return this.players.get(player.id).getOnMatch();
-  }
-
-  private registerPlayer(player: Player) {
-    if (!this.players.has(player.id)) {
+  private findOrCreatePlayer(playerInfo: any) {
+    if (!this.players.has(playerInfo.id)) {
+      const player = new Player(playerInfo);
       this.players.set(player.id, player);
     }
+
+    return this.players.get(playerInfo.id);
   }
 
   public createMatch(
@@ -49,22 +44,18 @@ export default class MatchManager {
     { player1: any, player2: any, context: any}
   ) {
     // Create players
-    const player1: Player = new Player(player1Info);
-    const player2: Player = new Player(player2Info);
-
-    // Register players
-    this.registerPlayer(player1);
-    this.registerPlayer(player2);
+    const player1: Player = this.findOrCreatePlayer(player1Info);
+    const player2: Player = this.findOrCreatePlayer(player2Info);
 
     // Validate player1 can play
-    if (this.isPlayerOnMatch(player1)) {
+    if (player1.onMatch) {
       console.log('Player1 is already on a fight');
       // this.eventManager.emit('error', `${player1.name} is already on a fight`);
       return;
     }
 
     // Validate player2 can play
-    if (this.isPlayerOnMatch(player2)) {
+    if (player2.onMatch) {
       console.log('Player2 is already on a fight');
       // this.eventManager.emit('error', `${player2.name} is already on a fight`);
       return;

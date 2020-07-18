@@ -1,5 +1,5 @@
 import PlayerStats from '../interfaces/interface.player.stats';
-import PlayerWeapon from '../interfaces/interface.player.weapon';
+import PlayerWeapon, { WeaponAbility } from '../interfaces/interface.player.weapon';
 import PlayerInterface from '../interfaces/interface.player';
 
 export default class Player {
@@ -11,9 +11,11 @@ export default class Player {
   public eligibleStats: PlayerStats[];
 
   public weapon: PlayerWeapon;
-  public opponent: Player;
+  public eligibleWeapons: PlayerWeapon[];
 
-  private onMatch: boolean = false;
+  public opponent: Player;
+  public onMatch: boolean = false;
+  public selectedAbility: WeaponAbility;
   
   constructor(props: PlayerInterface) {
     this.id = props.id;
@@ -22,10 +24,6 @@ export default class Player {
     this.stats = props.stats;
     this.weapon = props.weapon;
     this.opponent = props.opponent;
-  }
-
-  public getOnMatch() {
-    return this.onMatch;
   }
 
   public setOnMatch(status: boolean) {

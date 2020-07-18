@@ -13,10 +13,12 @@ export default class StatSelection {
     this.eventManager = eventManager;
   }
 
-  public execute(match: Match) {
+  public async execute(match: Match) {
     const sourceMessage: Discord.Message = match.getContext();
     this.askForSelection(match.player1, sourceMessage);
     this.askForSelection(match.player2, sourceMessage);
+
+    return [match, 'waitForStatSelection']
   }
 
   private async askForSelection(player: Player, message: Discord.Message) {
@@ -27,6 +29,8 @@ export default class StatSelection {
     for (let i=0; i < statsEntries.length - 1; i++) {
       msg.react(this.options[i]);
     }
+
+    // await new ReactionAwaiter(msg);
   }
 
   private statsTable(eligibleStats: PlayerStats[]) {

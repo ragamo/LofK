@@ -24,7 +24,7 @@ export default class FightCommand {
     }
     */
 
-    // Control no sense fight
+    // Control singularities
     if (opponent.bot) {
       message.reply('bots dont fight :(');
       return;
@@ -65,7 +65,7 @@ export default class FightCommand {
 
     const collector = msg.createReactionCollector(filter, { 
       max: 3,
-      time: 10000,
+      time: 30000,
     });
 
     collector.on('collect', (reaction: Discord.MessageReaction) => {
