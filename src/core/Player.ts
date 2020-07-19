@@ -34,6 +34,15 @@ export default class Player {
     this.opponent = opponent;
   }
 
+  attack(player: Player) {
+    player.stats.hp = player.stats.hp - 10;
+
+    return {
+      opponentStats: player.stats,
+      roll: 1,
+    }
+  }
+
   public generateEligibleStats(amount: number) {
     this.eligibleStats = [];
     for(let i=0; i<amount; i++) {

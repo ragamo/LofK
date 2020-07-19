@@ -1,4 +1,4 @@
-import Discord from 'discord.js';
+/* import Discord from 'discord.js';
 import { EventEmitter } from "events";
 import Match from "../../../core/Match";
 import Player from '../../../core/Player';
@@ -44,3 +44,4 @@ export default class StatSelection {
     return entries;
   }
 };
+*/

@@ -1,12 +1,18 @@
 import Discord from 'discord.js';
-import { EventEmitter } from 'events';
+import PlatformAdapter from '../PlatformAdapter';
 import { table } from 'table';
 
 export default class FightCommand {
   public name: string = 'fight';
   public description: string = 'Start a new match';
 
-  public async execute(message: Discord.Message, eventManager: EventEmitter) {
+  private platformAdapter: PlatformAdapter;
+
+  constructor(platformAdapter: PlatformAdapter) {
+    this.platformAdapter = platformAdapter;
+  }
+
+  public async execute(message: Discord.Message) {
     if (!message.mentions.users.size) {
       message.reply('you need to mention someone.');
       return;
@@ -40,44 +46,11 @@ export default class FightCommand {
       name: opponent.username,
     };
 
-    // Initiat match state
-    const matchState: any = {
-      context: message,
-      player1,
-      player2,
-    };  
-
-    // Announce new fight
-    const vs = table([[player1.name, 'vs', player2.name]]);
-    const announcement = `New Fight!\n${vs}\nBegin?`;
-    const msg = await message.channel.send(announcement, {
-      code: true,
-    });
-
-    // Prepare react button
-    msg.react('👍');
-
-    // Wait for players ready
-    const filter = (reaction: any, user: Discord.User) => {
-      return reaction.emoji.name === '👍' && 
-        (user.id === player1.id || user.id === player2.id);
-    };
-
-    const collector = msg.createReactionCollector(filter, { 
-      max: 3,
-      time: 30000,
-    });
-
-    collector.on('collect', (reaction: Discord.MessageReaction) => {
-      if (reaction.count === 2) {
-        eventManager.emit('createMatch', matchState);
-      }
-    });
-
-    collector.on('end', collected => {
-      if (collected.size < 3) {
-        message.reply('your opponent its a 🐣. Shame.')
-      }
-    });
+    try {
+      this.platformAdapter.createMatch(player1, player2, message);
+    } catch (err) {
+      console.error(err);
+      message.reply(err);
+    }
   }
 };

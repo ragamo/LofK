@@ -68,7 +68,7 @@ export default class FSM {
     return this;
   }
   
-  static nothing(data) {
+  static nothing(data: any) {
     return [data, null];
   }
   

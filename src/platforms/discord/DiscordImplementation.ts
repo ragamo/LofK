@@ -3,10 +3,9 @@ import { EventEmitter } from 'events';
 import DiscordCommand from '../../interfaces/interface.discord.command';
 import PingCommand from './commands/PingCommand';
 import FightCommand from './commands/FightCommand';
-import StatSelection from './commands/StatsSelection';
-import IPlatform from '../../interfaces/IPlatform';
+import PlatformAdapter from './PlatformAdapter';
 
-export class DiscordImplementation implements IPlatform {
+export class DiscordImplementation {
   private prefix:string = '!';
   private eventManager: EventEmitter;
   private client: Discord.Client = new Discord.Client();
@@ -15,16 +14,13 @@ export class DiscordImplementation implements IPlatform {
   /**
    * Constructor
    */
-  constructor(eventManager: EventEmitter) {
-    this.eventManager = eventManager;
-    
+  constructor(platformAdapter: PlatformAdapter) {    
     this.registerCommands([
       new PingCommand(),
-      new FightCommand(),
+      new FightCommand(platformAdapter),
     ]);
 
     this.handleDiscordEvents();
-    this.handleLofkEvents();
     this.start();
   }
 
@@ -54,7 +50,6 @@ export class DiscordImplementation implements IPlatform {
     // Ready
     this.client.once('ready', () => {
       console.log('🙂 Discord client is ready and listening');
-      this.eventManager.emit('ready');
     });
 
     // Message
@@ -86,17 +81,9 @@ export class DiscordImplementation implements IPlatform {
       return;
 
     try {
-      this.commands.get(command).execute(message, this.eventManager);
+      this.commands.get(command).execute(message);
     } catch (err) {
       console.error(err);
     }
-  }
-
-  /** 
-   * Handle game events
-   */
-  private handleLofkEvents() {
-    const statSelector = new StatSelection(this.eventManager);
-    this.eventManager.on('selectStats', statSelector.execute.bind(statSelector));
   }
 };

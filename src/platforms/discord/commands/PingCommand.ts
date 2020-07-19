@@ -1,11 +1,10 @@
 import Discord from 'discord.js';
-import { EventEmitter } from 'events';
 
 export default class PingCommand {
 	public name: string = 'ping';
 	public description: string = 'Ping!';
 
-	public execute(message: Discord.Message, eventManager: EventEmitter) {
+	public execute(message: Discord.Message) {
 		message.channel.send('Pong.');
 	}
 };

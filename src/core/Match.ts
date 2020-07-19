@@ -1,66 +1,69 @@
 import { v4 as uuidv4 } from 'uuid';
-import Player from "./Player";
 import FSM from './FSM';
-import PlayerStats from '../interfaces/interface.player.stats';
-import Platform from '../interfaces/Platform';
+import Player from "./Player";
 import MatchState from './MatchState';
+import Platform from '../interfaces/Platform';
 
 export default class Match {
   public id: string;
-  private platform: Platform;
-  private context: any;
-
+  public context: any;
   public state: MatchState;
 
-  private log: any;
+  private platform: Platform;
+  private log: [];
 
-  constructor(player1: Player, player2: Player, platform: Platform, context: any) {
+  constructor(player1: Player, player2: Player, context: any, platform: Platform) {
+    this.state = new MatchState(player1, player2);
+
     this.id = uuidv4();
     this.platform = platform;
     this.context = context;
-    this.state = new MatchState(player1, player2);
-    
-    this.handleStates();
   }
 
-  private handleStates() {
+  begin() {
     const fsm = new FSM();
+
+    fsm.setDefaultError('finishing', this.defaultError.bind(this));
+
+    fsm.addState('start')
+      .onEvent('default')
+        .goTo('creatingMatch').do(this.confirmFight.bind(this));
 
     fsm.addState('creatingMatch')
       .onEvent('matchConfirmed')
-        .goTo('asigningStats').do(this.askForStats)
+        .goTo('asigningStats').do(this.askForStats.bind(this))
       .onEvent('matchNotConfirmed')
-        .doDefaultError();
+        .goTo('finishing').doNothing();
 
     fsm.addState('asigningStats')
       .onEvent('statsAsigned')
-        .goTo('asigningWeapon').do(this.askForWeapon)
+        .goTo('asigningWeapon').do(this.askForWeapon.bind(this))
       .onEvent('statsNotAsigned')
-        .doDefaultError();
+        .goTo('finishing').doNothing();
 
     fsm.addState('asigningWeapon')
       .onEvent('weaponAsigned')
-        .goTo('startFighting').do(this.startFight)
+        .goTo('startFighting').do(this.startFight.bind(this))
       .onEvent('weaponNotAsigned')
-        .doDefaultError();
+        .goTo('finishing').doNothing();
 
     fsm.addState('startFighting')
       .onEvent('fightBegan')
-        .goTo('asigningAbility').do(this.askForAbility)
+        .goTo('asigningAbility').do(this.askForAbility.bind(this))
       .onEvent('error')
         .doDefaultError();
 
     fsm.addState('asigningAbility')
       .onEvent('abilityAssigned')
-        .goTo('attacking').do(this.attack)
+        .goTo('attacking').do(this.attack.bind(this))
       .onEvent('abilityNotAsigned')
         .doDefaultError();
 
     fsm.addState('attacking')
       .onEvent('turnChanged')
-        .goTo('asigningAbility').do(this.askForAbility)
+        .goTo('asigningAbility').do(this.askForAbility.bind(this))
       .onEvent('matchOver')
-        .goTo('finishingMatch').do(this.finishMatch)
+        .goTo('finishingMatch').do(this.finishMatch.bind(this))
 
     fsm.addState('finishingMatch')
       .onEvent('matchFinished')
@@ -70,9 +73,20 @@ export default class Match {
 
     fsm.run(this.state);
   }
-  
-  public getContext() {
-    return this.context;
+
+  async defaultError(state: MatchState) {
+    await this.platform.announceFightError('Fight not finished');
+    return [state, 'error'];
+  }
+
+  async confirmFight(state: MatchState) {
+    try {
+      await this.platform.announceFigthBegan(state.player1, state.player2);
+      return [state, 'matchConfirmed'];
+    } catch (err) {
+      this.platform.announceFightError(err);
+      return [state, 'matchNotConfirmed'];
+    }
   }
 
   async askForStats(state: MatchState) {
@@ -117,7 +131,7 @@ export default class Match {
   }
 
   async attack(state: MatchState) {
-    const opponentStats = state.playerOnTurn.attack(state.playerOnTurn.opponent);
+    const { opponentStats, roll } = state.playerOnTurn.attack(state.playerOnTurn.opponent);
 
     if (opponentStats.hp <= 0) {
       return [state, 'matchOver'];
@@ -125,7 +139,7 @@ export default class Match {
 
     state.playerOnTurn.opponent.stats = opponentStats;
     state.playerOnTurn = state.playerOnTurn.opponent;
-    await this.platform.announceFightDamage(opponentStats);
+    await this.platform.announceFightDamage(state.playerOnTurn.opponent);
 
     return [state, 'turnChanged'];
   }
@@ -138,5 +152,8 @@ export default class Match {
     await this.platform.announceFightFinished(state.playerOnTurn, state.playerOnTurn.opponent);
 
     return [state, 'matchFinished'];
+  }
+
+  async announceError(state: MatchState) {
   }
 }

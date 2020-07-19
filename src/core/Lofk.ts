@@ -1,20 +1,17 @@
-import { EventEmitter } from 'events';
-import Store from './Store';
 import MatchManager from './MatchManager';
+import PlatformAdapter from '../platforms/discord/PlatformAdapter';
 
 export default class Lokf {
-  private eventManager: EventEmitter = new EventEmitter();
-  private storeManager: Store = new Store();
-  // private matchManager: MatchManager;
 
   /**
    * Constructor
    */
   constructor(platforms: string[]) {
-    const matchManager = new MatchManager(this.storeManager, this.eventManager);
+    const matchManager = new MatchManager();
+    const platformAdapter = new PlatformAdapter(matchManager);
 
     for(const platform of platforms) {
-      this.runPlatform(platform, this.eventManager);
+      this.runPlatform(platform, platformAdapter);
     }
   }
 
@@ -23,11 +20,11 @@ export default class Lokf {
    * @param platform platform name
    * @param eventManager event manager
    */
-  private async runPlatform(platform: string, eventManager: EventEmitter) {
+  private async runPlatform(platform: string, platformAdapter: PlatformAdapter) {
     switch(platform) {
       case 'discord':
         const { DiscordImplementation } = await import(`../platforms/discord/DiscordImplementation`);
-        new DiscordImplementation(eventManager);
+        new DiscordImplementation(platformAdapter);
         break;
   
       default:
