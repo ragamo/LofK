@@ -1,5 +1,4 @@
 import Discord from 'discord.js';
-import { EventEmitter } from 'events';
 import DiscordCommand from '../../interfaces/interface.discord.command';
 import PingCommand from './commands/PingCommand';
 import FightCommand from './commands/FightCommand';
@@ -7,7 +6,6 @@ import PlatformAdapter from './PlatformAdapter';
 
 export class DiscordImplementation {
   private prefix:string = '!';
-  private eventManager: EventEmitter;
   private client: Discord.Client = new Discord.Client();
   private commands: Discord.Collection<string, DiscordCommand> = new Discord.Collection<string, DiscordCommand>();
 

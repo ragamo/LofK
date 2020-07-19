@@ -11,6 +11,13 @@ export default class Match {
   private platform: Platform;
   private log: [];
 
+  /**
+   * Create a new Match
+   * @param player1 player 1
+   * @param player2 player 1
+   * @param context platform handler
+   * @param platform platform implementation
+   */
   constructor(player1: Player, player2: Player, context: any, platform: Platform) {
     this.state = new MatchState(player1, player2, context);
 
@@ -18,6 +25,9 @@ export default class Match {
     this.platform = platform;
   }
 
+  /**
+   * Start a match
+   */
   begin() {
     const fsm = new FSM();
 
@@ -76,26 +86,38 @@ export default class Match {
     fsm.run(this.state);
   }
 
+  /**
+   * Handle default error
+   * @param state match state
+   */
   async defaultError(state: MatchState) {
-    await this.platform.announceFightError(state, '[ERROR] Match finished');
+    await this.platform.announceMatchError(state, '[ERROR] Match finished');
     return [state, 'error'];
   }
 
+  /**
+   * Handle match confirmation
+   * @param state match state
+   */
   async confirmFight(state: MatchState) {
     try {
       await this.platform.announceNewMatch(state);
       return [state, 'matchConfirmed'];
     } catch (err) {
       state.timeout = true;
-      this.platform.announceFightError(state, err);
+      this.platform.announceMatchError(state, err);
       return [state, 'matchNotConfirmed'];
     }
   }
 
+  /**
+   * Handle user stats selection
+   * @param state match state
+   */
   async askForStats(state: MatchState) {
     const [p1Stats, p2Stats] = await Promise.all([
-      this.platform.askForStatsSelection(state.player1),
-      this.platform.askForStatsSelection(state.player2),
+      this.platform.askForStatsSelection(state.player1, state),
+      this.platform.askForStatsSelection(state.player2, state),
     ]);
     
     state.player1.stats = p1Stats;
@@ -104,10 +126,14 @@ export default class Match {
     return [state, 'statsAsigned'];
   }
 
+  /**
+   * Handle user weapon selection
+   * @param state match state
+   */
   async askForWeapon(state: MatchState) {
     const [p1Weapon, p2Weapon] = await Promise.all([
-      this.platform.askForWeaponSelection(state.player1),
-      this.platform.askForWeaponSelection(state.player2),
+      this.platform.askForWeaponSelection(state.player1, state),
+      this.platform.askForWeaponSelection(state.player2, state),
     ]);
     
     state.player1.weapon = p1Weapon;
@@ -116,23 +142,35 @@ export default class Match {
     return [state, 'weaponAsigned'];
   }
 
+  /**
+   * Handle match started
+   * @param state match state
+   */
   async startFight(state: MatchState) {
     // Randomize turn
     const index = Math.floor(Math.random()*2);
     const players = [state.player1, state.player2];
     state.playerOnTurn = players[index];
 
-    await this.platform.announceFigthBegan(state);
+    await this.platform.announceMatchBegan(state);
 
     return [state, 'fightBegan'];
   }
 
+  /**
+   * Handle user ability selection
+   * @param state match state
+   */
   async askForAbility(state: MatchState) {
     state.playerOnTurn.selectedAbility = await this.platform.askForWeaponAbilitySelection(state.playerOnTurn);
 
     return [state, 'abilityAsigned'];
   }
 
+  /**
+   * Handle user attack
+   * @param state match state
+   */
   async attack(state: MatchState) {
     const { opponentStats, roll } = state.playerOnTurn.attack(state.playerOnTurn.opponent);
 
@@ -142,18 +180,26 @@ export default class Match {
 
     state.playerOnTurn.opponent.stats = opponentStats;
     state.playerOnTurn = state.playerOnTurn.opponent;
-    await this.platform.announceFightDamage(state);
+    await this.platform.announceMatchDamage(state);
 
     return [state, 'turnChanged'];
   }
 
+  /**
+   * Handle finish match
+   * @param state match state
+   */
   async finishMatch(state: MatchState) {
     // TODO: Calculate gold and XP
-    await this.platform.announceFightFinished(state);
+    await this.platform.announceMatchFinished(state);
 
     return [state, 'matchFinished'];
   }
 
+  /**
+   * Free memory allocation
+   * @param state match state
+   */
   clearMatch(state: MatchState) {
     this.state.clear();
     this.platform.finishMatch(this.id);

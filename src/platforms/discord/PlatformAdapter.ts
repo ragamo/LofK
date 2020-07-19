@@ -1,9 +1,12 @@
-import Discord from 'discord.js';
 import Platform from "../../interfaces/Platform";
 import MatchManager from "../../core/MatchManager";
-import { table } from "table";
 import MatchState from '../../core/MatchState';
-import Match from '../../core/Match';
+import Player from '../../core/Player';
+
+import matchAnnounceError from "./apdaters/match/match.announceError";
+import matchAnnounceNewMatch from './apdaters/match/match.announceNewMatch';
+import matchSelectStats from './apdaters/match/match.selectStats';
+import matchSelectWeapon from './apdaters/match/match.selectWeapon';
 
 export default class PlatformAdapter implements Platform { // extends PlatformAdapter
   private matchManager: MatchManager;
@@ -22,55 +25,19 @@ export default class PlatformAdapter implements Platform { // extends PlatformAd
   }
 
   async announceNewMatch(matchState: MatchState) {
-    const discordChannel = matchState.context.channel;
-
-    // Announce new fight
-    const vs = table([[matchState.player1.name, 'vs', matchState.player2.name]]);
-    const announcement = `New Fight!\n${vs}\nBegin?`;
-    const message: Discord.Message = await discordChannel.send(announcement, {
-      code: true,
-    });
-
-    // Prepare reaction button
-    await message.react('👍');
-
-    // Collect for only players involved
-    const filter = (reaction: any, user: Discord.User) => {
-      return reaction.emoji.name === '👍' && 
-        (user.id === matchState.player1.id || user.id === matchState.player2.id);
-    };
-
-    // Create reaction collector
-    const collector = message.createReactionCollector(filter, { 
-      max: 3,
-      time: 5000,
-    });
-
-    // Wait for responses
-    return new Promise((resolve, reject) => {
-      collector.on('collect', (reaction: Discord.MessageReaction) => {
-        if (reaction.count === 2) {
-          resolve();
-        }
-      });
-
-      collector.on('end', collected => {
-        if (collected.size < 3) {
-          reject('your opponent its a 🐣. Shame.');
-        }
-      });
-    });
+    return matchAnnounceNewMatch(matchState);
   }
 
-  announceFightError(matchState: MatchState, error: string) {
-    const message = matchState.context;
+  async askForStatsSelection(player: Player, matchState: MatchState) {
+    return matchSelectStats(player, matchState);
+  }
 
-    if (matchState.timeout) {
-      message.reply(error);
-      return;
-    }
+  async askForWeaponSelection(player: Player, matchState: MatchState) {
+    return matchSelectWeapon(player, matchState);
+  }
 
-    message.channel.send(error);
+  announceMatchError(matchState: MatchState, error: string) {
+    return matchAnnounceError(matchState, error);
   }
 
   finishMatch(idMatch: string) {

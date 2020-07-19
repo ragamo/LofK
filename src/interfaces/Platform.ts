@@ -7,13 +7,13 @@ export default interface Platform {
   createMatch(player1: any, player2: any, context: any): void;
   finishMatch(idMatch: string): void;
 
-  askForStatsSelection?(player: Player): PlayerStats;
-  askForWeaponSelection?(player: Player): PlayerWeapon;
+  askForStatsSelection(player: Player, matchState: MatchState): Promise<PlayerStats>;
+  askForWeaponSelection(player: Player, matchState: MatchState): Promise<PlayerWeapon>;
   askForWeaponAbilitySelection?(player: Player): WeaponAbility;
 
   announceNewMatch(matchState: MatchState): any;
-  announceFigthBegan?(matchState: MatchState): any;
-  announceFightDamage?(matchState: MatchState): any;
-  announceFightFinished?(matchState: MatchState): any;
-  announceFightError(state: MatchState, error: string): any;
+  announceMatchBegan?(matchState: MatchState): any;
+  announceMatchDamage?(matchState: MatchState): any;
+  announceMatchFinished?(matchState: MatchState): any;
+  announceMatchError(matchState: MatchState, error: string): void;
 }
