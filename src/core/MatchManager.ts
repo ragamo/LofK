@@ -28,34 +28,22 @@ export default class MatchManager {
 
     // Validate if player1 can play
     if (player1.onMatch) {
-      throw new Error(`${player1.name} is already on a match`);
+      throw { busyPlayer: player1 };
     }
 
     // Validate if player2 can play
     if (player2.onMatch) {
-      throw new Error(`${player2.name} is already on a match`);
+      throw { busyPlayer: player1 };
     }
 
     // Create new match
     const match = new Match(player1, player2, context, platform);
     this.matches.set(match.id, match);
 
-    match.begin();
     return match;
-
-    // Next state
-    // this.eventManager.emit('selectStats', match);
   }
 
-  findMatchByPlayer(player: Player) {
-    for(const match of this.matches.values()) {
-      if (match.state.player1 === player) {
-        return match;
-      }
-      if (match.state.player2 === player) {
-        return match;
-      }
-    }
-    return null;
+  finishMatch(idMatch: string) {
+    this.matches.delete(idMatch);
   }
 };

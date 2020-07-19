@@ -6,18 +6,16 @@ import Platform from '../interfaces/Platform';
 
 export default class Match {
   public id: string;
-  public context: any;
   public state: MatchState;
 
   private platform: Platform;
   private log: [];
 
   constructor(player1: Player, player2: Player, context: any, platform: Platform) {
-    this.state = new MatchState(player1, player2);
+    this.state = new MatchState(player1, player2, context);
 
     this.id = uuidv4();
     this.platform = platform;
-    this.context = context;
   }
 
   begin() {
@@ -33,7 +31,7 @@ export default class Match {
       .onEvent('matchConfirmed')
         .goTo('asigningStats').do(this.askForStats.bind(this))
       .onEvent('matchNotConfirmed')
-        .goTo('finishing').doNothing();
+        .goTo('clearingMatch').do(this.clearMatch.bind(this))
 
     fsm.addState('asigningStats')
       .onEvent('statsAsigned')
@@ -65,9 +63,13 @@ export default class Match {
       .onEvent('matchOver')
         .goTo('finishingMatch').do(this.finishMatch.bind(this))
 
+    fsm.addState('clearingMatch')
+      .onEvent('matchCleared')
+        .goTo('finishing').doNothing();
+
     fsm.addState('finishingMatch')
       .onEvent('matchFinished')
-        .goTo('finishing').doNothing()
+        .goTo('finishing').doNothing();
 
     fsm.setLastState('finishing');
 
@@ -75,16 +77,17 @@ export default class Match {
   }
 
   async defaultError(state: MatchState) {
-    await this.platform.announceFightError('Fight not finished');
+    await this.platform.announceFightError(state, '[ERROR] Match finished');
     return [state, 'error'];
   }
 
   async confirmFight(state: MatchState) {
     try {
-      await this.platform.announceFigthBegan(state.player1, state.player2);
+      await this.platform.announceNewMatch(state);
       return [state, 'matchConfirmed'];
     } catch (err) {
-      this.platform.announceFightError(err);
+      state.timeout = true;
+      this.platform.announceFightError(state, err);
       return [state, 'matchNotConfirmed'];
     }
   }
@@ -119,7 +122,7 @@ export default class Match {
     const players = [state.player1, state.player2];
     state.playerOnTurn = players[index];
 
-    await this.platform.announceFigthBegan(state.player1, state.player2);
+    await this.platform.announceFigthBegan(state);
 
     return [state, 'fightBegan'];
   }
@@ -139,21 +142,22 @@ export default class Match {
 
     state.playerOnTurn.opponent.stats = opponentStats;
     state.playerOnTurn = state.playerOnTurn.opponent;
-    await this.platform.announceFightDamage(state.playerOnTurn.opponent);
+    await this.platform.announceFightDamage(state);
 
     return [state, 'turnChanged'];
   }
 
   async finishMatch(state: MatchState) {
     // TODO: Calculate gold and XP
-    state.player1.onMatch = false;
-    state.player2.onMatch = false;
-
-    await this.platform.announceFightFinished(state.playerOnTurn, state.playerOnTurn.opponent);
+    await this.platform.announceFightFinished(state);
 
     return [state, 'matchFinished'];
   }
 
-  async announceError(state: MatchState) {
+  clearMatch(state: MatchState) {
+    this.state.clear();
+    this.platform.finishMatch(this.id);
+
+    return [state, 'matchCleared'];
   }
-}
+};

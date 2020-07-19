@@ -1,7 +1,7 @@
 import MatchManager from './MatchManager';
 import PlatformAdapter from '../platforms/discord/PlatformAdapter';
 
-export default class Lokf {
+export default class Lofk {
 
   /**
    * Constructor

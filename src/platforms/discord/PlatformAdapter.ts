@@ -1,27 +1,31 @@
 import Discord from 'discord.js';
 import Platform from "../../interfaces/Platform";
 import MatchManager from "../../core/MatchManager";
-import Player from "../../core/Player";
 import { table } from "table";
+import MatchState from '../../core/MatchState';
 import Match from '../../core/Match';
 
-export default class PlatformAdapter implements Platform {
+export default class PlatformAdapter implements Platform { // extends PlatformAdapter
   private matchManager: MatchManager;
-  private match: Match;
   
   constructor(matchManager: MatchManager) {
     this.matchManager = matchManager;
   }
   
   createMatch(player1: any, player2: any, context:any) {
-    this.match = this.matchManager.createMatch({player1, player2, context, platform: this });
+    try {
+      const match = this.matchManager.createMatch({player1, player2, context, platform: this });
+      match.begin();
+    } catch ({ busyPlayer }) {
+      context.reply(`<@${busyPlayer.id}> is already on a match.`);
+    }
   }
 
-  async announceFigthBegan(player1: Player, player2: Player) {
-    const discordChannel = this.matchManager.findMatchByPlayer(player1).context.channel;
+  async announceNewMatch(matchState: MatchState) {
+    const discordChannel = matchState.context.channel;
 
     // Announce new fight
-    const vs = table([[player1.name, 'vs', player2.name]]);
+    const vs = table([[matchState.player1.name, 'vs', matchState.player2.name]]);
     const announcement = `New Fight!\n${vs}\nBegin?`;
     const message: Discord.Message = await discordChannel.send(announcement, {
       code: true,
@@ -30,10 +34,10 @@ export default class PlatformAdapter implements Platform {
     // Prepare reaction button
     await message.react('👍');
 
-    // Filter for players on match
+    // Collect for only players involved
     const filter = (reaction: any, user: Discord.User) => {
       return reaction.emoji.name === '👍' && 
-        (user.id === player1.id || user.id === player2.id);
+        (user.id === matchState.player1.id || user.id === matchState.player2.id);
     };
 
     // Create reaction collector
@@ -58,9 +62,19 @@ export default class PlatformAdapter implements Platform {
     });
   }
 
-  async announceFightError(error: string) {
-    const discordChannel = this.match.context.channel;
-    await discordChannel.send(error);
+  announceFightError(matchState: MatchState, error: string) {
+    const message = matchState.context;
+
+    if (matchState.timeout) {
+      message.reply(error);
+      return;
+    }
+
+    message.channel.send(error);
+  }
+
+  finishMatch(idMatch: string) {
+    this.matchManager.finishMatch(idMatch);
   }
 
 };

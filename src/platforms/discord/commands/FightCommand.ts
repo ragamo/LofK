@@ -48,6 +48,7 @@ export default class FightCommand {
 
     try {
       this.platformAdapter.createMatch(player1, player2, message);
+      // this.platformAdapter.match.create(player1, player2, message);
     } catch (err) {
       console.error(err);
       message.reply(err);
