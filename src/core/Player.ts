@@ -14,7 +14,7 @@ export default class Player {
   public eligibleWeapons: PlayerWeapon[];
 
   public opponent: Player;
-  public onMatch: boolean = false;
+  public busy: boolean = false;
   public selectedAbility: WeaponAbility;
   
   constructor(props: PlayerInterface) {
@@ -26,8 +26,8 @@ export default class Player {
     this.opponent = props.opponent;
   }
 
-  public setOnMatch(status: boolean) {
-    this.onMatch = status;
+  public setBusy(status: boolean) {
+    this.busy = status;
   }
 
   public setOpponent(opponent: Player) {

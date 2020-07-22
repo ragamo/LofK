@@ -1,6 +1,6 @@
 import Player from "./Player";
 
-export default class MatchState {
+export default class DuelState {
   public context: any;
   public timeout: boolean = false;
 

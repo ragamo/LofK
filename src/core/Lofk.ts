@@ -1,5 +1,5 @@
 import MatchManager from './MatchManager';
-import PlatformAdapter from '../platforms/discord/PlatformAdapter';
+import PlatformAdapter from './PlatformAdapter';
 
 export default class Lofk {
 

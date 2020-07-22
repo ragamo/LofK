@@ -1,4 +1,4 @@
-import PlatformAdapter from "../platforms/discord/PlatformAdapter";
+import PlatformAdapter from "./PlatformAdapter";
 import MatchState from "./MatchState";
 import Match from "./Match";
 import Player from "./Player";
@@ -35,16 +35,17 @@ export default class MatchManager {
 
     try {
       // Validate if player1 can play
-      if (player1.onMatch) {
+      if (player1.busy) {
         throw { busyPlayer: player1 };
       }
 
       // Validate if player2 can play
-      if (player2.onMatch) {
+      if (player2.busy) {
         throw { busyPlayer: player1 };
       }
     } catch ({ busyPlayer }) {
       context.reply(`<@${busyPlayer.id}> is already on a match.`);
+      return;
     }
     
 
@@ -90,7 +91,7 @@ export default class MatchManager {
   }
 
   async announceMatchFinished(matchState: MatchState) {
-    
+
   }
 
   finishMatch(idMatch: string) {

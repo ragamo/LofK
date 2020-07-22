@@ -2,7 +2,7 @@ import Discord from 'discord.js';
 import DiscordCommand from '../../interfaces/interface.discord.command';
 import PingCommand from './commands/PingCommand';
 import FightCommand from './commands/FightCommand';
-import PlatformAdapter from './PlatformAdapter';
+import PlatformAdapter from '../../core/PlatformAdapter';
 
 export class DiscordImplementation {
   private prefix:string = '!';

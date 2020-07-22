@@ -1,5 +1,5 @@
 import Discord from 'discord.js';
-import PlatformAdapter from '../PlatformAdapter';
+import PlatformAdapter from '../../../core/PlatformAdapter';
 
 export default class FightCommand {
   public name: string = 'fight';

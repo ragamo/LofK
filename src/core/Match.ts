@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import FSM from './FSM';
 import Player from "./Player";
 import MatchState from './MatchState';
-import PlatformAdapter from '../platforms/discord/PlatformAdapter';
+import PlatformAdapter from './PlatformAdapter';
 
 export default class Match {
   public id: string;
