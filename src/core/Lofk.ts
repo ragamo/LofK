@@ -7,8 +7,7 @@ export default class Lofk {
    * Constructor
    */
   constructor(platforms: string[]) {
-    const matchManager = new MatchManager();
-    const platformAdapter = new PlatformAdapter(matchManager);
+    const platformAdapter = new PlatformAdapter();
 
     for(const platform of platforms) {
       this.runPlatform(platform, platformAdapter);

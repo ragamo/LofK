@@ -13,8 +13,13 @@ const statsTable = (eligibleStats: PlayerStats[]) => {
     carry.push([options[index], current.str, current.dex, current.int]);
     return carry;
   }, [header]);
+
+  const transposed = entries[0].map(
+    (_: any, colIndex: string | number) => 
+      entries.map((row: { [x: string]: any; }) => row[colIndex])
+    );
   
-  return entries;
+  return transposed;
 }
 
 const askForSelection = async (player: Player, message: Discord.Message): Promise<PlayerStats> => {

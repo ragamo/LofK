@@ -2,13 +2,13 @@ import { v4 as uuidv4 } from 'uuid';
 import FSM from './FSM';
 import Player from "./Player";
 import MatchState from './MatchState';
-import Platform from '../interfaces/Platform';
+import PlatformAdapter from '../platforms/discord/PlatformAdapter';
 
 export default class Match {
   public id: string;
   public state: MatchState;
 
-  private platform: Platform;
+  private platform: PlatformAdapter;
   private log: [];
 
   /**
@@ -18,7 +18,7 @@ export default class Match {
    * @param context platform handler
    * @param platform platform implementation
    */
-  constructor(player1: Player, player2: Player, context: any, platform: Platform) {
+  constructor(player1: Player, player2: Player, context: any, platform: PlatformAdapter) {
     this.state = new MatchState(player1, player2, context);
 
     this.id = uuidv4();
@@ -47,7 +47,7 @@ export default class Match {
       .onEvent('statsAsigned')
         .goTo('asigningWeapon').do(this.askForWeapon.bind(this))
       .onEvent('statsNotAsigned')
-        .goTo('finishing').doNothing();
+        .goTo('clearingMatch').do(this.clearMatch.bind(this))
 
     fsm.addState('asigningWeapon')
       .onEvent('weaponAsigned')
@@ -91,7 +91,7 @@ export default class Match {
    * @param state match state
    */
   async defaultError(state: MatchState) {
-    await this.platform.announceMatchError(state, '[ERROR] Match finished');
+    await this.platform.match.announceMatchError(state, '[ERROR] Match finished');
     return [state, 'error'];
   }
 
@@ -101,11 +101,11 @@ export default class Match {
    */
   async confirmFight(state: MatchState) {
     try {
-      await this.platform.announceNewMatch(state);
+      await this.platform.match.announceNewMatch(state);
       return [state, 'matchConfirmed'];
     } catch (err) {
       state.timeout = true;
-      this.platform.announceMatchError(state, err);
+      this.platform.match.announceMatchError(state, err);
       return [state, 'matchNotConfirmed'];
     }
   }
@@ -116,8 +116,8 @@ export default class Match {
    */
   async askForStats(state: MatchState) {
     const [p1Stats, p2Stats] = await Promise.all([
-      this.platform.askForStatsSelection(state.player1, state),
-      this.platform.askForStatsSelection(state.player2, state),
+      this.platform.match.askForStatsSelection(state.player1, state),
+      this.platform.match.askForStatsSelection(state.player2, state),
     ]);
     
     state.player1.stats = p1Stats;
@@ -132,8 +132,8 @@ export default class Match {
    */
   async askForWeapon(state: MatchState) {
     const [p1Weapon, p2Weapon] = await Promise.all([
-      this.platform.askForWeaponSelection(state.player1, state),
-      this.platform.askForWeaponSelection(state.player2, state),
+      this.platform.match.askForWeaponSelection(state.player1, state),
+      this.platform.match.askForWeaponSelection(state.player2, state),
     ]);
     
     state.player1.weapon = p1Weapon;
@@ -152,7 +152,7 @@ export default class Match {
     const players = [state.player1, state.player2];
     state.playerOnTurn = players[index];
 
-    await this.platform.announceMatchBegan(state);
+    await this.platform.match.announceMatchBegan(state);
 
     return [state, 'fightBegan'];
   }
@@ -162,7 +162,7 @@ export default class Match {
    * @param state match state
    */
   async askForAbility(state: MatchState) {
-    state.playerOnTurn.selectedAbility = await this.platform.askForWeaponAbilitySelection(state.playerOnTurn);
+    state.playerOnTurn.selectedAbility = await this.platform.match.askForWeaponAbilitySelection(state.playerOnTurn, state);
 
     return [state, 'abilityAsigned'];
   }
@@ -180,7 +180,7 @@ export default class Match {
 
     state.playerOnTurn.opponent.stats = opponentStats;
     state.playerOnTurn = state.playerOnTurn.opponent;
-    await this.platform.announceMatchDamage(state);
+    await this.platform.match.announceMatchDamage(state);
 
     return [state, 'turnChanged'];
   }
@@ -191,7 +191,7 @@ export default class Match {
    */
   async finishMatch(state: MatchState) {
     // TODO: Calculate gold and XP
-    await this.platform.announceMatchFinished(state);
+    await this.platform.match.announceMatchFinished(state);
 
     return [state, 'matchFinished'];
   }
@@ -202,7 +202,7 @@ export default class Match {
    */
   clearMatch(state: MatchState) {
     this.state.clear();
-    this.platform.finishMatch(this.id);
+    this.platform.match.finishMatch(this.id);
 
     return [state, 'matchCleared'];
   }
