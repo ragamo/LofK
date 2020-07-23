@@ -1,5 +1,5 @@
 import Discord from 'discord.js';
-import DiscordCommand from '../../interfaces/interface.discord.command';
+import DiscordCommand from './DiscordCommand';
 import PingCommand from './commands/PingCommand';
 import FightCommand from './commands/FightCommand';
 import PlatformAdapter from '../../core/PlatformAdapter';

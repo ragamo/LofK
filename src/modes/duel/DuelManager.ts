@@ -1,11 +1,11 @@
-import DuelPlayer from "../modes/duel/DuelPlayer";
+import PlatformAdapter from "../../core/PlatformAdapter";
+import DuelPlayer from "./DuelPlayer";
 import Duel from "./Duel";
-import PlatformAdapter from "./PlatformAdapter";
 import DuelState from "./DuelState";
-import duelAnnounceError from "../platforms/discord/apdaters/duel/duel.announceError";
-import DuelWeapons from "../modes/duel/DuelWeapons";
-import { DuelWeaponAbility } from "../modes/duel/DuelWeapon";
-import duelAnnounceNewDuel from "../platforms/discord/apdaters/duel/duel.announceNewDuel";
+import DuelWeapons from "./DuelWeapons";
+import { DuelWeaponAbility } from "./DuelWeapon";
+import duelAnnounceNewDuel from "../../platforms/discord/apdaters/duel/duel.announceNewDuel";
+import duelAnnounceError from '../../platforms/discord/apdaters/duel/duel.announceError'
 
 export default class DuelManager {
   private duels: Map<string, Duel> = new Map<string, Duel>();

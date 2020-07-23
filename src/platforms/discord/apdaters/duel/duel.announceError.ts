@@ -1,4 +1,4 @@
-import DuelState from "../../../../core/DuelState";
+import DuelState from "../../../../modes/duel/DuelState";
 
 export default (state: DuelState, error: string) => {
   const message = state.context;

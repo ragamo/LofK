@@ -1,3 +1,4 @@
+/*
 import Discord from 'discord.js';
 import Player from "../../../../core/Player";
 import PlayerStats from "../../../../interfaces/interface.player.stats";
@@ -39,3 +40,4 @@ const askForSelection = async (player: Player, message: Discord.Message): Promis
 
 export default async (player: Player, state: MatchState) =>
   askForSelection(player, state.context);
+*/

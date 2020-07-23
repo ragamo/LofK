@@ -1,4 +1,3 @@
-import MatchManager from './MatchManager';
 import PlatformAdapter from './PlatformAdapter';
 
 export default class Lofk {

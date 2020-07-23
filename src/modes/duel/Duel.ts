@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
-import PlatformAdapter from "./PlatformAdapter";
+import PlatformAdapter from "../../core/PlatformAdapter";
 import DuelState from "./DuelState";
-import Player from "../modes/duel/DuelPlayer";
-import FSM from './FSM';
-import DuelWeapon from '../modes/duel/DuelWeapon';
+import Player from "./DuelPlayer";
+import FSM from '../../core/FSM';
+import DuelWeapon from './DuelWeapon';
 
 export default class Duel {
     public id: string;

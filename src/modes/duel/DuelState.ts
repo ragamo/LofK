@@ -1,4 +1,4 @@
-import Player from "../modes/duel/DuelPlayer";
+import Player from "./DuelPlayer";
 
 export default class DuelState {
   public context: any;

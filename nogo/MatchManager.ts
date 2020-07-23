@@ -1,4 +1,4 @@
-import PlatformAdapter from "./PlatformAdapter";
+import PlatformAdapter from "../core/PlatformAdapter";
 import MatchState from "./MatchState";
 import Match from "./Match";
 import Player from "./Player";

@@ -1,5 +1,5 @@
 import Discord from 'discord.js';
-import DuelState from "../../../../core/DuelState";
+import DuelState from "../../../../modes/duel/DuelState";
 import { table } from "table";
 
 const options = ['🏹', '🗡', '🔪'];
