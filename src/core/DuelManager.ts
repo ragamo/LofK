@@ -1,14 +1,19 @@
-import Player from "./Player";
+import DuelPlayer from "../modes/duel/DuelPlayer";
 import Duel from "./Duel";
 import PlatformAdapter from "./PlatformAdapter";
+import DuelState from "./DuelState";
+import duelAnnounceError from "../platforms/discord/apdaters/duel/duel.announceError";
+import DuelWeapons from "../modes/duel/DuelWeapons";
+import { DuelWeaponAbility } from "../modes/duel/DuelWeapon";
+import duelAnnounceNewDuel from "../platforms/discord/apdaters/duel/duel.announceNewDuel";
 
 export default class DuelManager {
   private duels: Map<string, Duel> = new Map<string, Duel>();
-  private players: Map<string, Player> = new Map<string, Player>();
+  private players: Map<string, DuelPlayer> = new Map<string, DuelPlayer>();
 
   private findOrCreatePlayer(playerInfo: any) {
     if (!this.players.has(playerInfo.id)) {
-      const player = new Player(playerInfo);
+      const player = new DuelPlayer(playerInfo);
       this.players.set(player.id, player);
     }
 
@@ -20,8 +25,8 @@ export default class DuelManager {
     { player1: any, player2: any, platform: PlatformAdapter, context: any}
   ) {
     // Create players
-    const player1: Player = this.findOrCreatePlayer(player1Info);
-    const player2: Player = this.findOrCreatePlayer(player2Info);
+    const player1: DuelPlayer = this.findOrCreatePlayer(player1Info);
+    const player2: DuelPlayer = this.findOrCreatePlayer(player2Info);
 
     try {
       // Validate if player1 can play
@@ -43,8 +48,45 @@ export default class DuelManager {
     const duel = new Duel(player1, player2, context, platform);
     this.duels.set(duel.id, duel);
 
+    const weapons = new DuelWeapons();
+    duel.weapons = weapons.getWeapons();
     duel.begin();
 
     return duel;
   }
+
+  async announceDuelError(duelState: DuelState, error: string) {
+    return duelAnnounceError(duelState, error);
+  }
+
+  async announceNewDuel(duelState: DuelState) {
+    return duelAnnounceNewDuel(duelState);
+  }
+
+  async announceDuelBegan(duelState: DuelState) {
+
+  }
+
+  async askForWeaponSelection(player: DuelPlayer, duelState: DuelState) {
+    // return duelSelectWeapon(player, duelState);
+  }
+
+  async askForWeaponAbilitySelection(player: DuelPlayer, duelState: DuelState): Promise<DuelWeaponAbility> {
+    return new Promise(resolve => {
+      resolve();
+    })
+  }
+
+  async announceDuelDamage(duelState: DuelState) {
+
+  }
+
+  async announceDuelFinished(duelState: DuelState) {
+
+  }
+
+  async finishDuel(idDuel: string) {
+
+  }
+  
 }

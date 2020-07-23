@@ -1,4 +1,4 @@
-import Player from "./Player";
+import Player from "../modes/duel/DuelPlayer";
 
 export default class DuelState {
   public context: any;
@@ -20,10 +20,6 @@ export default class DuelState {
 
     this.player1.setOpponent(player2);
     this.player2.setOpponent(player1);
-
-    // Randomize initial stats
-    this.player1.generateEligibleStats(3);
-    this.player2.generateEligibleStats(3);
   }
 
   clear() {

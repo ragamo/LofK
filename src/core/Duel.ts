@@ -1,12 +1,14 @@
 import { v4 as uuidv4 } from 'uuid';
 import PlatformAdapter from "./PlatformAdapter";
 import DuelState from "./DuelState";
-import Player from "./Player";
+import Player from "../modes/duel/DuelPlayer";
 import FSM from './FSM';
+import DuelWeapon from '../modes/duel/DuelWeapon';
 
 export default class Duel {
     public id: string;
     public state: DuelState;
+    public weapons: DuelWeapon[];
   
     private platform: PlatformAdapter;
     private log: [];
@@ -128,13 +130,13 @@ export default class Duel {
    * @param state duel state
    */
   async attack(state: DuelState) {
-    const { opponentStats, roll } = state.playerOnTurn.attack(state.playerOnTurn.opponent);
+    const { player, roll } = state.playerOnTurn.attack(state.playerOnTurn.opponent);
 
-    if (opponentStats.hp <= 0) {
+    if (player.hp <= 0) {
       return [state, 'duelOver'];
     }
 
-    state.playerOnTurn.opponent.stats = opponentStats;
+    state.playerOnTurn.opponent.hp = player.hp;
     state.playerOnTurn = state.playerOnTurn.opponent;
     await this.platform.duel.announceDuelDamage(state);
 
