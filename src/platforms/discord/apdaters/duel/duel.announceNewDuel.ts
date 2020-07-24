@@ -1,19 +1,8 @@
 import Discord from 'discord.js';
-import DuelState from "../../../../modes/duel/DuelState";
 import { table } from "table";
-import DuelWeapon, { DuelWeaponAbility } from '../../../../modes/duel/DuelWeapon';
-
-const transposed = (entries: [[]]) => entries[0].map(
-  (_: any, colIndex: string | number) => 
-    entries.map((row: { [x: string]: any; }) => row[colIndex])
-  );
-
-const abilitiesMatrix = (abilities: DuelWeaponAbility[]) => {
-  return abilities.reduce((carry: any, current: DuelWeaponAbility, index: number) => {
-    carry.push([current.name, current.rolls, current.dmg, current.crit]);
-    return carry;
-  }, [['', 'rolls', 'dmg', 'crit']]);
-};
+import DuelState from "../../../../modes/duel/DuelState";
+import DuelWeapon from '../../../../modes/duel/DuelWeapon';
+import { transposed, abilitiesMatrix } from '../../helpers/helper.duel';
 
 const weaponsMatrix = (weapons: DuelWeapon[]) => {
   const weaponNames = [];
@@ -64,16 +53,26 @@ const announceNewDuel = async (duelState: DuelState): Promise<any> => {
     time: 10000,
   });
   
+  
+  let p1Weapon: DuelWeapon;
+  let p2Weapon: DuelWeapon;
+
   // Wait for reactions
-  let playersReady = 0;
   return new Promise((resolve, reject) => {
     collector.on('collect', (reaction: Discord.MessageReaction) => {
       if (reaction.count > 1) {
-        const playerReady = [...reaction.users.cache]
-          .map(([id, user]) => id)
-          .some(idUser => 
-            idUser === duelState.player1.id || idUser === duelState.player2.id
-          );
+        const knownPlayer = [...reaction.users.cache]
+          .map(([idUser, user]) => idUser)
+          .reduce((carry, idUser) => {
+            if (idUser === duelState.player1.id) {
+              carry[0] = idUser;
+              return carry;
+            }
+            if (idUser === duelState.player2.id) {
+              carry[1] = idUser;
+              return carry;
+            }
+          }, []);
 
         if (playerReady) {
           playersReady += 1;

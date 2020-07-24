@@ -4,19 +4,16 @@ import { DuelWeaponAbility } from './DuelWeapon';
 export default class DuelPlayer {
   public id: string;
   public name: string;
-  public hp: number = 100;
-
-  public weapon: DuelWeapon;
-  public eligibleWeapons: DuelWeapon[];
-
-  public opponent: DuelPlayer;
   public busy: boolean = false;
+
+  public hp: number = 100;
+  public opponent: DuelPlayer;
+  public weapon: DuelWeapon;
   public selectedAbility: DuelWeaponAbility;
   
   constructor(props: DuelPlayer) {
     this.id = props.id;
     this.name = props.name;
-    this.weapon = props.weapon;
     this.opponent = props.opponent;
   }
 

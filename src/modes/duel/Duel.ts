@@ -93,7 +93,10 @@ export default class Duel {
    */
   async confirmDuel(state: DuelState) {
     try {
-      await this.platform.duel.announceNewDuel(state);
+      const [p1Weapon, p2Weapon] = await this.platform.duel.announceNewDuel(state);
+      state.player1.weapon = p1Weapon;
+      state.player2.weapon = p2Weapon;
+
       return [state, 'weaponConfirmed'];
     } catch (err) {
       state.timeout = true;
