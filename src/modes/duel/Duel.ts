@@ -3,12 +3,11 @@ import PlatformAdapter from "../../core/PlatformAdapter";
 import DuelState from "./DuelState";
 import Player from "./DuelPlayer";
 import FSM from '../../core/FSM';
-import DuelWeapon from './DuelWeapon';
+import DuelWeapons from './DuelWeapons';
 
 export default class Duel {
     public id: string;
     public state: DuelState;
-    public weapons: DuelWeapon[];
   
     private platform: PlatformAdapter;
     private log: [];
@@ -22,6 +21,9 @@ export default class Duel {
      */
     constructor(player1: Player, player2: Player, context: any, platform: PlatformAdapter) {
       this.state = new DuelState(player1, player2, context);
+
+      const weapons = new DuelWeapons();
+      this.state.weapons = weapons.getWeapons();
   
       this.id = uuidv4();
       this.platform = platform;

@@ -1,4 +1,5 @@
 import Player from "./DuelPlayer";
+import DuelWeapon from "./DuelWeapon";
 
 export default class DuelState {
   public context: any;
@@ -8,6 +9,8 @@ export default class DuelState {
   public player2: Player;
   public playerOnTurn: Player;
   public winner: Player;
+
+  public weapons: DuelWeapon[];
 
   constructor(player1: Player, player2: Player, context: any) {
     this.context = context;

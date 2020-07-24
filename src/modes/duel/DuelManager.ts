@@ -48,8 +48,6 @@ export default class DuelManager {
     const duel = new Duel(player1, player2, context, platform);
     this.duels.set(duel.id, duel);
 
-    const weapons = new DuelWeapons();
-    duel.weapons = weapons.getWeapons();
     duel.begin();
 
     return duel;

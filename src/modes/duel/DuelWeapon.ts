@@ -1,5 +1,6 @@
 export interface DuelWeaponAbility {
   name: string;
+  icon: string;
   rolls: number;
   dmg: number;
   crit: number;
