@@ -40,7 +40,7 @@ const announceNewDuel = async (duelState: DuelState): Promise<any> => {
   }
   
   // Collect only for players involved
-  const filter = (reaction: any, user: Discord.User) => {
+  const filter = (reaction: Discord.MessageReaction, user: Discord.User) => {
     return duelState.weapons.some(weapon => {
       return weapon.icon === reaction.emoji.name && 
         (user.id === duelState.player1.id || user.id === duelState.player2.id);
@@ -59,27 +59,22 @@ const announceNewDuel = async (duelState: DuelState): Promise<any> => {
 
   // Wait for reactions
   return new Promise((resolve, reject) => {
-    collector.on('collect', (reaction: Discord.MessageReaction) => {
+    collector.on('collect', (reaction: Discord.MessageReaction, user: Discord.User) => {
       if (reaction.count > 1) {
-        const knownPlayer = [...reaction.users.cache]
-          .map(([idUser, user]) => idUser)
-          .reduce((carry, idUser) => {
-            if (idUser === duelState.player1.id) {
-              carry[0] = idUser;
-              return carry;
-            }
-            if (idUser === duelState.player2.id) {
-              carry[1] = idUser;
-              return carry;
-            }
-          }, []);
+        const selectedWeapon = duelState.weapons.find(weapon => 
+          weapon.icon === reaction.emoji.name
+        );
 
-        if (playerReady) {
-          playersReady += 1;
+        if (user.id === duelState.player1.id) {
+          p1Weapon = selectedWeapon;
         }
 
-        if (playersReady === 2) {
-          resolve();
+        if (user.id === duelState.player2.id) {
+          p2Weapon = selectedWeapon;
+        }
+
+        if (p1Weapon && p2Weapon) {
+          resolve([p1Weapon, p2Weapon]);
         }
       }
     });

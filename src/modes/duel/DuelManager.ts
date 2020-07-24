@@ -7,6 +7,7 @@ import { DuelWeaponAbility } from "./DuelWeapon";
 import duelAnnounceNewDuel from "../../platforms/discord/apdaters/duel/duel.announceNewDuel";
 import duelAnnounceError from '../../platforms/discord/apdaters/duel/duel.announceError'
 import duelAnnounceDuelBegan from "../../platforms/discord/apdaters/duel/duel.announceDuelBegan";
+import duelAskForAbility from "../../platforms/discord/apdaters/duel/duel.askForAbility";
 
 export default class DuelManager {
   private duels: Map<string, Duel> = new Map<string, Duel>();
