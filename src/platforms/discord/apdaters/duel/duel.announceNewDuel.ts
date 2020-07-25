@@ -39,7 +39,8 @@ const announceNewDuel = async (duelState: DuelState): Promise<any> => {
   
   // Create reaction collector
   const collector = message.createReactionCollector(filter, { 
-    time: 45000,
+    //time: 45000,
+    time: 5000,
   });
   
   
@@ -64,6 +65,7 @@ const announceNewDuel = async (duelState: DuelState): Promise<any> => {
 
         if (p1Weapon && p2Weapon) {
           resolve([p1Weapon, p2Weapon]);
+          collector.stop();
         }
       }
     });

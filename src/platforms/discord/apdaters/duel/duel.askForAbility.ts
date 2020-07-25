@@ -31,7 +31,8 @@ const askForAbility = async (duelState: DuelState): Promise<DuelWeaponAbility> =
 
   // Create reaction collector
   const collector = message.createReactionCollector(filter, { 
-    time: 30000,
+    // time: 30000,
+    time: 5000,
   });
   
   // Wait for reactions
@@ -44,13 +45,14 @@ const askForAbility = async (duelState: DuelState): Promise<DuelWeaponAbility> =
 
         if (user.id === player.id) {
           resolve(selectedAbility);
+          collector.stop();
         }
       }
     });
     
     collector.on('end', collected => {
-      if (collected.size < 3) {
-        reject(`you didn't select anything. <@${duelState.playerOnTurn.opponent.id}> wins.`);
+      if (collected.size < 2) {
+        reject(`you didn't selected an ability. <@${duelState.playerOnTurn.opponent.id}> wins.`);
       }
     });
   });

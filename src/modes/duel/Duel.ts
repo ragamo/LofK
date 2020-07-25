@@ -180,9 +180,8 @@ export default class Duel {
    */
   clearDuel(state: DuelState) {
     console.log('🧹 Duel cleared.', `${state.player1.name} vs ${state.player2.name}`);
-    this.state.clear();
     this.platform.duel.finishDuel(this.id);
-
+    this.state.clear();
     return [state, 'duelCleared'];
   }
 }
