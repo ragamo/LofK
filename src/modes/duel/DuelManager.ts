@@ -8,6 +8,7 @@ import duelAnnounceNewDuel from "../../platforms/discord/apdaters/duel/duel.anno
 import duelAnnounceError from '../../platforms/discord/apdaters/duel/duel.announceError'
 import duelAnnounceDuelBegan from "../../platforms/discord/apdaters/duel/duel.announceDuelBegan";
 import duelAskForAbility from "../../platforms/discord/apdaters/duel/duel.askForAbility";
+import duelAnnounceDuelDamage from "../../platforms/discord/apdaters/duel/duel.announceDuelDamage";
 
 export default class DuelManager {
   private duels: Map<string, Duel> = new Map<string, Duel>();
@@ -67,12 +68,12 @@ export default class DuelManager {
     return duelAnnounceDuelBegan(duelState);
   }
 
-  async askForWeaponAbilitySelection(player: DuelPlayer, duelState: DuelState): Promise<DuelWeaponAbility> {
-    return duelAskForAbility(player, duelState);
+  async askForWeaponAbility(duelState: DuelState): Promise<DuelWeaponAbility> {
+    return duelAskForAbility(duelState);
   }
 
-  async announceDuelDamage(duelState: DuelState) {
-
+  async announceDuelDamage(duelState: DuelState, attackResult: any) {
+    return duelAnnounceDuelDamage(duelState, attackResult);
   }
 
   async announceDuelFinished(duelState: DuelState) {

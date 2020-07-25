@@ -52,7 +52,7 @@ export default class DuelWeapons {
           },
           {
             name: 'Multishot',
-            icon: '👨‍👦‍👦',
+            icon: '🎯',
             rolls: 5,
             dmg: 25,
             crit: 20,

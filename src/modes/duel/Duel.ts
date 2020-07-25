@@ -50,14 +50,12 @@ export default class Duel {
     fsm.addState('startDueling')
       .onEvent('duelBegan')
         .goTo('asigningAbility').do(this.askForAbility.bind(this))
-      .onEvent('error')
-        .doDefaultError();
 
     fsm.addState('asigningAbility')
       .onEvent('abilityAssigned')
         .goTo('attacking').do(this.attack.bind(this))
-      .onEvent('abilityNotAsigned')
-        .doDefaultError();
+      .onEvent('abilityNotAssigned')
+        .goTo('clearingDuel').do(this.clearDuel.bind(this))
 
     fsm.addState('attacking')
       .onEvent('turnChanged')
@@ -96,11 +94,13 @@ export default class Duel {
       const [p1Weapon, p2Weapon] = await this.platform.duel.announceNewDuel(state);
       state.player1.weapon = p1Weapon;
       state.player2.weapon = p2Weapon;
-
       return [state, 'weaponConfirmed'];
+
     } catch (err) {
+      console.error(err);
       state.timeout = true;
       this.platform.duel.announceDuelError(state, err);
+      console.log('weaponNotConfirmed');
       return [state, 'weaponNotConfirmed'];
     }
   }
@@ -116,7 +116,6 @@ export default class Duel {
     state.playerOnTurn = players[index];
 
     await this.platform.duel.announceDuelBegan(state);
-
     return [state, 'duelBegan'];
   }
 
@@ -125,9 +124,17 @@ export default class Duel {
    * @param state match state
    */
   async askForAbility(state: DuelState) {
-    state.playerOnTurn.selectedAbility = await this.platform.duel.askForWeaponAbilitySelection(state.playerOnTurn, state);
+    try {
+      state.playerOnTurn.selectedAbility = await this.platform.duel.askForWeaponAbility(state);
+      return [state, 'abilityAssigned'];
 
-    return [state, 'abilityAsigned'];
+    } catch (err) {
+      console.error(err);
+
+      state.timeout = true;
+      this.platform.duel.announceDuelError(state, err);
+      return [state, 'abilityNotAssigned'];
+    }
   }
 
   /**
@@ -135,16 +142,18 @@ export default class Duel {
    * @param state duel state
    */
   async attack(state: DuelState) {
-    const { player, roll } = state.playerOnTurn.attack(state.playerOnTurn.opponent);
+    const attackResult = state.playerOnTurn.attack(state.playerOnTurn.opponent);
 
-    if (player.hp <= 0) {
+    const opponent = state.playerOnTurn.opponent;
+    opponent.hp = opponent.hp - attackResult.dmg;
+
+    await this.platform.duel.announceDuelDamage(state, attackResult);
+
+    if (opponent.hp <= 0) {
       return [state, 'duelOver'];
     }
 
-    state.playerOnTurn.opponent.hp = player.hp;
     state.playerOnTurn = state.playerOnTurn.opponent;
-    await this.platform.duel.announceDuelDamage(state);
-
     return [state, 'turnChanged'];
   }
 
@@ -154,7 +163,6 @@ export default class Duel {
    */
   async finishDuel(state: DuelState) {
     await this.platform.duel.announceDuelFinished(state);
-
     return [state, 'duelFinished'];
   }
 
@@ -164,6 +172,7 @@ export default class Duel {
    * @param state duel state
    */
   clearDuel(state: DuelState) {
+    console.log('⛔️ Duel cleared due timeout.', `${state.player1.name} vs ${state.player2.name}`);
     this.state.clear();
     this.platform.duel.finishDuel(this.id);
 

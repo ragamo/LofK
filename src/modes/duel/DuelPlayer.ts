@@ -1,11 +1,13 @@
 import DuelWeapon from "./DuelWeapon";
 import { DuelWeaponAbility } from './DuelWeapon';
+import { format } from "path";
 
 export default class DuelPlayer {
   public id: string;
   public name: string;
   public busy: boolean = false;
 
+  public lvl: number = 1;
   public hp: number = 100;
   public opponent: DuelPlayer;
   public weapon: DuelWeapon;
@@ -25,12 +27,30 @@ export default class DuelPlayer {
     this.opponent = opponent;
   }
 
-  attack(player: DuelPlayer) {
-    player.hp = player.hp - 10;
+  attack(opponent: DuelPlayer) {
+    // const roll = this.roll();
+    const roll = [1, 1, 1];
+
+    // Calculate dmg
+    const dmgMultiplier = roll.reduce((carry, current) => carry + current, 0);
+    const isCritical = dmgMultiplier === roll.length;
+    const critical = isCritical ? (1 + this.selectedAbility.crit / 100) : 1;
+    let dmg = Math.floor(dmgMultiplier * (this.selectedAbility.dmg / roll.length) * critical);
 
     return {
-      player,
-      roll: 1,
+      dmg,
+      isCritical,
+      isMiss: dmgMultiplier === 0,
+      roll,
     }
+  }
+
+  private roll() {
+    const rolled = [];
+    for (let i=0; i<this.selectedAbility.rolls; i += 1) {
+      const roll = Math.random()*10 < 6 ? 1 : 0;
+      rolled.push(roll);
+    } 
+    return rolled;
   }
 }

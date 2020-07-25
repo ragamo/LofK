@@ -20,19 +20,17 @@ const weaponsMatrix = (weapons: DuelWeapon[]) => {
 };
 
 const announceNewDuel = async (duelState: DuelState): Promise<any> => {
-  const discordChannel = duelState.context.channel;
+  const discordChannel: Discord.TextChannel = duelState.context.channel;
   
   // Generate vs table
-  const vs = table([[duelState.player1.name, 'vs', duelState.player2.name]]);
+  const vs = table([[`${duelState.player1.name}`, 'vs', `${duelState.player2.name}`]]);
 
   // Display weapons
   const weapons = table(weaponsMatrix(duelState.weapons));
 
   // Announce new fight
   const announcement = `New Fight!\`\`\`${vs}\`\`\`\nChoose your weapon\`\`\`${weapons}\`\`\``;
-  const message: Discord.Message = await discordChannel.send(announcement, {
-    // code: true,
-  });
+  const message: Discord.Message = await discordChannel.send(announcement);
   
   // Prepare reaction buttons
   for(const weapon of duelState.weapons) {
