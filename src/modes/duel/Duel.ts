@@ -82,6 +82,7 @@ export default class Duel {
    */
   async defaultError(state: DuelState) {
     await this.platform.duel.announceDuelError(state, '[ERROR] Duel finished');
+    console.log('🌀 FSM: defaultError');
     return [state, 'error'];
   }
 
@@ -94,6 +95,7 @@ export default class Duel {
       const [p1Weapon, p2Weapon] = await this.platform.duel.announceNewDuel(state);
       state.player1.weapon = p1Weapon;
       state.player2.weapon = p2Weapon;
+      console.log('🌀 FSM: weaponConfirmed');
       return [state, 'weaponConfirmed'];
 
     } catch (err) {
@@ -115,6 +117,7 @@ export default class Duel {
     state.playerOnTurn = players[index];
 
     await this.platform.duel.announceDuelBegan(state);
+    console.log('🌀 FSM: duelBegan');
     return [state, 'duelBegan'];
   }
 
@@ -125,6 +128,7 @@ export default class Duel {
   async askForAbility(state: DuelState) {
     try {
       state.playerOnTurn.selectedAbility = await this.platform.duel.askForWeaponAbility(state);
+      console.log('🌀 FSM: abilityAssigned');
       return [state, 'abilityAssigned'];
 
     } catch (err) {
@@ -153,6 +157,7 @@ export default class Duel {
     }
 
     state.playerOnTurn = state.playerOnTurn.opponent;
+    console.log('🌀 FSM: turnChanged');
     return [state, 'turnChanged'];
   }
 
