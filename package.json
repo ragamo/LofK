@@ -20,9 +20,7 @@
     "dotenv": "^8.2.0",
     "eslint": "^7.4.0",
     "table": "^5.4.6",
+    "typescript": "^3.9.6",
     "uuid": "^8.2.0"
-  },
-  "devDependencies": {
-    "typescript": "^3.9.6"
   }
 }
