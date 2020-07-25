@@ -63,12 +63,12 @@ export default class Duel {
       .onEvent('duelOver')
         .goTo('finishingDuel').do(this.finishDuel.bind(this))
 
-    fsm.addState('clearingDuel')
-      .onEvent('duelCleared')
-        .goTo('finishing').doNothing();
-
     fsm.addState('finishingDuel')
       .onEvent('duelFinished')
+        .goTo('clearingDuel').do(this.clearDuel.bind(this))
+
+    fsm.addState('clearingDuel')
+      .onEvent('duelCleared')
         .goTo('finishing').doNothing();
 
     fsm.setLastState('finishing');
@@ -81,7 +81,7 @@ export default class Duel {
    * @param state duel state
    */
   async defaultError(state: DuelState) {
-    await this.platform.duel.announceDuelError(state, '[ERROR] Duel finished');
+    await this.platform.duel.announceDuelError(state, '[SERVER ERROR] Duel finished.');
     console.log('🌀 FSM: defaultError');
     return [state, 'error'];
   }
@@ -99,6 +99,7 @@ export default class Duel {
       return [state, 'weaponConfirmed'];
 
     } catch (err) {
+      console.log(err);
       state.timeout = true;
       this.platform.duel.announceDuelError(state, err);
       console.log('🌀 FSM: weaponNotConfirmed');
@@ -132,6 +133,7 @@ export default class Duel {
       return [state, 'abilityAssigned'];
 
     } catch (err) {
+      console.log(err);
       state.timeout = true;
       this.platform.duel.announceDuelError(state, err);
       console.log('🌀 FSM: abilityNotAssigned');
@@ -177,7 +179,7 @@ export default class Duel {
    * @param state duel state
    */
   clearDuel(state: DuelState) {
-    console.log('⛔️ Duel cleared due timeout.', `${state.player1.name} vs ${state.player2.name}`);
+    console.log('🧹 Duel cleared.', `${state.player1.name} vs ${state.player2.name}`);
     this.state.clear();
     this.platform.duel.finishDuel(this.id);
 

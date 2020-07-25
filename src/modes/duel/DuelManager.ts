@@ -9,6 +9,7 @@ import duelAnnounceError from '../../platforms/discord/apdaters/duel/duel.announ
 import duelAnnounceDuelBegan from "../../platforms/discord/apdaters/duel/duel.announceDuelBegan";
 import duelAskForAbility from "../../platforms/discord/apdaters/duel/duel.askForAbility";
 import duelAnnounceDuelDamage from "../../platforms/discord/apdaters/duel/duel.announceDuelDamage";
+import duelAnnounceDuelFinished from "../../platforms/discord/apdaters/duel/duel.announceDuelFinished";
 
 export default class DuelManager {
   private duels: Map<string, Duel> = new Map<string, Duel>();
@@ -77,11 +78,11 @@ export default class DuelManager {
   }
 
   async announceDuelFinished(duelState: DuelState) {
-
+    return duelAnnounceDuelFinished(duelState);
   }
 
   async finishDuel(idDuel: string) {
-
+    this.duels.delete(idDuel);
   }
   
 }

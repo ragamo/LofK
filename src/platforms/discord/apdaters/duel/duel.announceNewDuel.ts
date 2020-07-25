@@ -2,31 +2,23 @@ import Discord from 'discord.js';
 import { table } from "table";
 import DuelState from "../../../../modes/duel/DuelState";
 import DuelWeapon from '../../../../modes/duel/DuelWeapon';
-import { transposed, abilitiesMatrix } from '../../helpers/helper.duel';
-
-const weaponsMatrix = (weapons: DuelWeapon[]) => {
-  const weaponNames = [];
-  const weaponAbilities = [];
-  
-  for(const weapon of weapons) {
-    weaponNames.push(`${weapon.name} (${weapon.icon})`);
-    weaponAbilities.push(table(transposed(abilitiesMatrix(weapon.abilities))).replace(/\n$/,''));
-  }
-
-  return [
-    weaponNames,
-    weaponAbilities,
-  ];
-};
+import { transposed, playersMatrix, weaponsMatrix, weaponMatrix } from '../../helpers/helper.duel';
 
 const announceNewDuel = async (duelState: DuelState): Promise<any> => {
   const discordChannel: Discord.TextChannel = duelState.context.channel;
   
   // Generate vs table
-  const vs = table([[`${duelState.player1.name}`, 'vs', `${duelState.player2.name}`]]);
+  const vs = table(transposed(playersMatrix([duelState.player1, duelState.player2])));
+
+  const newFighters = `New Fight!\`\`\`${vs}\`\`\` \n`;
+  // await discordChannel.send(newFighters);
 
   // Display weapons
-  const weapons = table(weaponsMatrix(duelState.weapons));
+  let weapons = '';
+  for(const weapon of duelState.weapons) {
+    weapons += table(weaponMatrix(weapon));
+    weapons += '\n';
+  }
 
   // Announce new fight
   const announcement = `New Fight!\`\`\`${vs}\`\`\`\nChoose your weapon\`\`\`${weapons}\`\`\``;
