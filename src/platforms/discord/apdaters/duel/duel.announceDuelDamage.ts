@@ -21,6 +21,7 @@ const announceDuelDamage = async (duelState: DuelState, attackResult:any): Promi
       ? '= MISS' : '';
 
   announcement += `\`\`\``;
+  announcement += `Used: ${attackResult.ability.name}\n`;
   announcement += `Roll: [${rollMap}] = ${hits}/${attackResult.roll.length} ${critOrMiss}\n`;
   announcement += `Damage dealt: ${attackResult.dmg}`;
   announcement += `\`\`\``;

@@ -28,8 +28,7 @@ export default class DuelPlayer {
   }
 
   attack(opponent: DuelPlayer) {
-    // const roll = this.roll();
-    const roll = [1, 1, 1];
+    const roll = this.roll();
 
     // Calculate dmg
     const dmgMultiplier = roll.reduce((carry, current) => carry + current, 0);
@@ -42,6 +41,7 @@ export default class DuelPlayer {
       isCritical,
       isMiss: dmgMultiplier === 0,
       roll,
+      ability: this.selectedAbility,
     }
   }
 

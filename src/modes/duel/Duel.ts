@@ -97,10 +97,9 @@ export default class Duel {
       return [state, 'weaponConfirmed'];
 
     } catch (err) {
-      console.error(err);
       state.timeout = true;
       this.platform.duel.announceDuelError(state, err);
-      console.log('weaponNotConfirmed');
+      console.log('🌀 FSM: weaponNotConfirmed');
       return [state, 'weaponNotConfirmed'];
     }
   }
@@ -129,10 +128,9 @@ export default class Duel {
       return [state, 'abilityAssigned'];
 
     } catch (err) {
-      console.error(err);
-
       state.timeout = true;
       this.platform.duel.announceDuelError(state, err);
+      console.log('🌀 FSM: abilityNotAssigned');
       return [state, 'abilityNotAssigned'];
     }
   }
@@ -150,6 +148,7 @@ export default class Duel {
     await this.platform.duel.announceDuelDamage(state, attackResult);
 
     if (opponent.hp <= 0) {
+      console.log('🌀 FSM: duelOver');
       return [state, 'duelOver'];
     }
 
@@ -163,6 +162,7 @@ export default class Duel {
    */
   async finishDuel(state: DuelState) {
     await this.platform.duel.announceDuelFinished(state);
+    console.log('🏁 Duel finished');
     return [state, 'duelFinished'];
   }
 

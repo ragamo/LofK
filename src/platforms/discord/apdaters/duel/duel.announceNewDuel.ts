@@ -47,8 +47,7 @@ const announceNewDuel = async (duelState: DuelState): Promise<any> => {
   
   // Create reaction collector
   const collector = message.createReactionCollector(filter, { 
-    max: 3,
-    time: 10000,
+    time: 45000,
   });
   
   
