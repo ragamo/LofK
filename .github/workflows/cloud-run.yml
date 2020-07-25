@@ -43,6 +43,7 @@ jobs:
     # Build and push image to Google Container Registry
     - name: Build
       run: |-
+        echo DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} > .env
         gcloud builds submit \
           --quiet \
           --tag "gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA"
