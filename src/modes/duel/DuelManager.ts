@@ -80,6 +80,9 @@ export default class DuelManager {
   }
 
   async finishDuel(idDuel: string) {
+    const duel = this.duels.get(idDuel);
+    this.players.delete(duel.state.player1.id);
+    this.players.delete(duel.state.player2.id);
     this.duels.delete(idDuel);
   }
   

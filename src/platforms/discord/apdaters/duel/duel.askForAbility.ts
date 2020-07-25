@@ -31,8 +31,7 @@ const askForAbility = async (duelState: DuelState): Promise<DuelWeaponAbility> =
 
   // Create reaction collector
   const collector = message.createReactionCollector(filter, { 
-    // time: 30000,
-    time: 5000,
+    time: 30000,
   });
   
   // Wait for reactions
