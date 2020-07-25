@@ -46,7 +46,7 @@ export default class FightCommand {
     };
 
     try {
-      this.platformAdapter.duel.create({ 
+      await this.platformAdapter.duel.create({ 
         player1, 
         player2, 
         platform: this.platformAdapter, // TODO: mejorar esto

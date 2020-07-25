@@ -24,7 +24,7 @@ export default class DuelManager {
     return this.players.get(playerInfo.id);
   }
 
-  public create(
+  public async create(
     { player1: player1Info, player2: player2Info, platform, context }: 
     { player1: any, player2: any, platform: PlatformAdapter, context: any}
   ) {
@@ -52,9 +52,7 @@ export default class DuelManager {
     const duel = new Duel(player1, player2, context, platform);
     this.duels.set(duel.id, duel);
 
-    duel.begin();
-
-    return duel;
+    await duel.begin();
   }
 
   async announceDuelError(duelState: DuelState, error: string) {

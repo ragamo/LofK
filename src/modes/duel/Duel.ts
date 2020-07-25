@@ -32,7 +32,7 @@ export default class Duel {
     /**
    * Start a duel
    */
-  begin() {
+  async begin() {
     const fsm = new FSM();
 
     fsm.setDefaultError('finishing', this.defaultError.bind(this));
@@ -73,7 +73,7 @@ export default class Duel {
 
     fsm.setLastState('finishing');
 
-    fsm.run(this.state);
+    await fsm.run(this.state);
   }
 
   /**
