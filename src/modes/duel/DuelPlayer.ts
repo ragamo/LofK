@@ -8,7 +8,7 @@ export default class DuelPlayer {
   public busy: boolean = false;
 
   public lvl: number = 1;
-  public hp: number = 100;
+  public hp: number = 50;
   public opponent: DuelPlayer;
   public weapon: DuelWeapon;
   public selectedAbility: DuelWeaponAbility;
