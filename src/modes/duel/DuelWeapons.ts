@@ -12,23 +12,23 @@ export default class DuelWeapons {
           {
             name: 'Strike',
             icon: '⚔️',
-            rolls: 3,
-            dmg: 12,
-            crit: 10,
+            rolls: 2,
+            dmg: 19,
+            crit: 20,
           },
           {
             name: 'Swing',
             icon: '⛏',
-            rolls: 4,
-            dmg: 18,
+            rolls: 3,
+            dmg: 22,
             crit: 15,
           },
           {
             name: 'Smite',
             icon: '🪓',
             rolls: 5,
-            dmg: 25,
-            crit: 20,
+            dmg: 28,
+            crit: 25,
           }
         ]
       },
@@ -39,23 +39,23 @@ export default class DuelWeapons {
           {
             name: 'Shot',
             icon: '🏹',
-            rolls: 3,
-            dmg: 12,
-            crit: 10,
+            rolls: 1,
+            dmg: 23,
+            crit: 0,
           },
           {
             name: 'Snipe',
             icon: '🔫',
-            rolls: 4,
-            dmg: 18,
-            crit: 15,
+            rolls: 3,
+            dmg: 23,
+            crit: 18,
           },
           {
             name: 'Multishot',
             icon: '🎯',
             rolls: 5,
-            dmg: 25,
-            crit: 20,
+            dmg: 36,
+            crit: 15,
           }
         ]
       },
@@ -67,22 +67,22 @@ export default class DuelWeapons {
             name: 'Stab',
             icon: '🔪',
             rolls: 3,
-            dmg: 12,
-            crit: 10,
+            dmg: 25,
+            crit: 15,
           },
           {
             name: 'Cleave',
             icon: '🪓',
             rolls: 4,
-            dmg: 18,
-            crit: 15,
+            dmg: 29,
+            crit: 21,
           },
           {
             name: 'Precision',
             icon: '🔨',
             rolls: 5,
-            dmg: 25,
-            crit: 20,
+            dmg: 36,
+            crit: 22,
           }
         ]
       }
